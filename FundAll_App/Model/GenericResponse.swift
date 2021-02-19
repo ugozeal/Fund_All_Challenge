@@ -8,6 +8,14 @@
 import Foundation
 import ObjectMapper
 
+//
+//{
+//    "success": {
+//        "status": "SUCCESS",
+//        "url": "https://res.cloudinary.com/fundaller/image/upload/v1613761029/4d0e74c8-a1fc-4610-8385-0905e68d0b50.jpg",
+//        "message": "Avatar uploaded successfully"
+//    }
+//}
 class AvatarResponse: Mappable, Decodable {
     required convenience init?(map: Map) {
         self.init()

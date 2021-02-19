@@ -48,7 +48,29 @@ extension ApiClientWithHeaders {
         }
     }
     
-    
+    func requestImageUpload(image: UIImage?, completion: @escaping(AvatarResponse?, Error?) -> ()) {
+        let token = UserDefaults.standard.string(forKey: "loginToken")
+        let url = K.URL.upDateAvatar
+            let headers: HTTPHeaders = [
+                "Authorization": "Bearer \(token!)",
+                "Accept": "multipart/form-data"
+            ]
+            AF.upload(
+                multipartFormData: { (MultipartFormData) in
+                    MultipartFormData.append(image!.jpegData(compressionQuality: 0.1)!, withName: "avatar", fileName: "file.jpeg", mimeType: "image/jpeg")
+                }, to: url, method: .post, headers: headers
+            ).responseDecodable(of: AvatarResponse.self) {
+                response in
+                if let error = response.error {
+                    completion(nil, error)
+                    return
+                }
+                if let result = response.value {
+                    completion(result, nil)
+                    return
+                }
+            }
+        }
     
     // This function converts httpMethodType enum (business logic) to Alamofire httpmethod
     private func httpMethodConversion(httpMethod: HttpMethodType) -> HTTPMethod {

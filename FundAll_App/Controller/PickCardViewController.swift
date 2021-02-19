@@ -19,8 +19,7 @@ class PickCardViewController: UIViewController {
     var activityLoader = UIView()
     let delay = 3
     var referButton = UIButton()
-    var isDone: Bool = false
-
+    let profileImageView = UIImageView()
     
     //MARK:- UITableViewDataSource
     private var pickCardCells = CardActivityModel.pickCardCells()
@@ -28,8 +27,24 @@ class PickCardViewController: UIViewController {
     //MARK: - Overrides
     override func viewDidLoad() {
         super.viewDidLoad()
+        NetworkClass.shared.loadUserData { (feedback) in
+            if feedback.success?.status == "SUCCESS" {
+                DispatchQueue.main.async {
+                    guard let url = URL(string: feedback.success?.data?.avatar ?? "") else { return }
+                    UIImage.loadImage(from: url) { (image) in
+                        self.profileImageView.image = image
+                    }
+                }
+            }
+        } failure: { (error) in
+            print("Error\(error)")
+        }
         view.backgroundColor = .white
         setupViews()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
     }
 
     // MARK: - Set up Views
@@ -59,9 +74,7 @@ class PickCardViewController: UIViewController {
             make.centerY.equalTo(topView).offset(20)
         }
         
-        let profileImageView = UIImageView()
         topView.addSubview(profileImageView)
-        profileImageView.image = UIImage(named: "test")
         profileImageView.clipsToBounds = true
         profileImageView.contentMode = .scaleAspectFill
         profileImageView.layer.cornerRadius = 15
@@ -215,8 +228,6 @@ class PickCardViewController: UIViewController {
         navigationItem.leftBarButtonItem = cancelButton
     }
     
-
-    
     func setupPopup() {
         view.addSubview(coverView)
         coverView.backgroundColor = UIColor(red: 0.18, green: 0.19, blue: 0.2, alpha: 0.9)
@@ -292,16 +303,15 @@ class PickCardViewController: UIViewController {
     @objc func animateView(_ view1: UIView) {
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: .curveEaseInOut) {
             view1.backgroundColor = .red
-            view1.alpha = 0
         } completion: { (finished) in
             print("Animation Finished: \(finished)")
             view1.backgroundColor = .systemGray
-            view1.alpha = 1
         }
     }
     
     @objc func handleCancelButton() {
         let destinationVc = HomeViewController()
+        destinationVc.profileImageView = profileImageView
         destinationVc.modalPresentationStyle = .fullScreen
         present(destinationVc, animated: true, completion: nil)
     }

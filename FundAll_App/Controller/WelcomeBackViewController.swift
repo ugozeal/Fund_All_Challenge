@@ -27,13 +27,30 @@ class WelcomeBackViewController: UIViewController {
     var emailDetails = ""
     var firstName = ""
     let delay = 3
-    var clientDetails = GetClientDataResponse()
 
     //MARK: - Overrides
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupAllViews()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        NetworkClass.shared.loadUserData { (feedback) in
+            if feedback.success?.status == "SUCCESS" {
+                DispatchQueue.main.async {
+                    guard let url = URL(string: feedback.success?.data?.avatar ?? "") else { return }
+                    UIImage.loadImage(from: url) { (image) in
+                        self.profileImageView.image = image
+                    }
+                    self.firstName = feedback.success?.data?.firstname ?? String()
+                    self.emailDetails = feedback.success?.data?.email ?? String()
+                }
+            }
+        } failure: { (error) in
+            print("Error\(error)")
+        }
     }
     
     //MARK: - Setup Views
@@ -69,7 +86,7 @@ class WelcomeBackViewController: UIViewController {
     
     func setupProfileImage() {
         view.addSubview(profileImageView)
-        profileImageView.image = UIImage(named: "profile-image")
+        profileImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.exclamationmark", withConfiguration: UIImage.SymbolConfiguration(weight: .regular))?.withTintColor(K.Colors.defaultGreen ?? UIColor(), renderingMode: .alwaysOriginal)
         profileImageView.clipsToBounds = true
         profileImageView.layer.cornerRadius = 72
         profileImageView.snp.makeConstraints { (make) in
@@ -116,6 +133,7 @@ class WelcomeBackViewController: UIViewController {
         passwordTextField.isSecureTextEntry = true
         passwordTextField.delegate = self
         passwordTextField.enablePasswordToggle()
+        passwordTextField.textAlignment = .center
         passwordTextField.setValue(UIFont(name: K.Fonts.regular, size: 15.0),forKeyPath: "placeholderLabel.font")
         let centeredParagraphStyle = NSMutableParagraphStyle()
         centeredParagraphStyle.alignment = .center
@@ -292,3 +310,4 @@ extension WelcomeBackViewController {
         }
     }
 }
+

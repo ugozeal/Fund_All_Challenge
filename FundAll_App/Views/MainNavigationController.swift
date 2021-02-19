@@ -32,7 +32,6 @@ class MainNavigationController: UIViewController {
                         self.avatar.image = image
                     }
                 }
-                
                 self.firstName = feedback.success?.data?.firstname ?? String()
                 self.emailDetails = feedback.success?.data?.email ?? String()
                 self.perform(#selector(self.doNecessarySegue), with: nil, afterDelay: 2)
@@ -51,7 +50,7 @@ class MainNavigationController: UIViewController {
             let welcomeBackScreen = WelcomeBackViewController()
             welcomeBackScreen.emailDetails = emailDetails
             welcomeBackScreen.firstName = firstName
-            welcomeBackScreen.profileImageView = avatar
+            welcomeBackScreen.profileImageView.image = avatar.image
             welcomeBackScreen.modalPresentationStyle = .fullScreen
             self.present(welcomeBackScreen, animated: true, completion: nil)
         }

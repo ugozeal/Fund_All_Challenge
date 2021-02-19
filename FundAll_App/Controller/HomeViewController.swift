@@ -7,6 +7,9 @@
 
 import UIKit
 import SnapKit
+import MobileCoreServices
+import Alamofire
+import SwiftUI
 
 class HomeViewController: UIViewController {
     //MARK:- Properties
@@ -23,6 +26,7 @@ class HomeViewController: UIViewController {
     var uploadImageButton = UIButton()
     var currentImage: UIImage?
     var uploadImage = UpDateAvatar()
+    @State var  profileImageView = UIImageView()
     
     //MARK:- UITableViewDataSource
     private var cardCells = CardActivityModel.createCardActivityCells()
@@ -30,6 +34,18 @@ class HomeViewController: UIViewController {
     //MARK:- Overrides
     override func viewDidLoad() {
         super.viewDidLoad()
+        NetworkClass.shared.loadUserData { (feedback) in
+            if feedback.success?.status == "SUCCESS" {
+                DispatchQueue.main.async {
+                    guard let url = URL(string: feedback.success?.data?.avatar ?? "") else { return }
+                    UIImage.loadImage(from: url) { (image) in
+                        self.profileImageView.image = image
+                    }
+                }
+            }
+        } failure: { (error) in
+            print("Error\(error)")
+        }
         view.backgroundColor = K.Colors.homeBgColor
         navigationBar()
         setupScrollView()
@@ -44,6 +60,10 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
     }
 
     // MARK: - Setup Views
@@ -102,9 +122,7 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(titleLabel)
         }
         
-        let profileImageView = UIImageView()
         topView.addSubview(profileImageView)
-        profileImageView.image = UIImage(named: "test")
         profileImageView.clipsToBounds = true
         profileImageView.contentMode = .scaleAspectFill
         profileImageView.layer.cornerRadius = 15
@@ -707,7 +725,6 @@ class HomeViewController: UIViewController {
         picker.allowsEditing = true
         picker.delegate = self
         present(picker, animated: true)
-//        uploadAvatar()
     }
     
     
@@ -740,15 +757,20 @@ extension HomeViewController: UIImagePickerControllerDelegate,UINavigationContro
         guard let image = info[.editedImage] as? UIImage else { return }
         dismiss(animated: true)
         currentImage = image
+        profileImageView.image = currentImage
+        uploadProfileImage()
     }
-    
-    func uploadAvatar() {
-        uploadImage.avatar = currentImage?.pngData()
-        NetworkClass.shared.uploadAvatar(requestModel: uploadImage) { (feedback) in
-            print("Success\(feedback.success?.message ?? "")")
-        } failure: { (error) in
-            print("Error\(error)")
-        }
+}
 
+extension HomeViewController {
+    func uploadProfileImage() {
+        ApiClientWithHeaders.shared.requestImageUpload(image: currentImage) { (response, error) in
+            if let successResp = response {
+                print(successResp.success?.message ?? String())
+            }
+            if let failure = error {
+                print("Error\(failure)")
+            }
+        }
     }
 }

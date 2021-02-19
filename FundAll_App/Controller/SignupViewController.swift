@@ -31,12 +31,32 @@ class SignupViewController: UIViewController {
     var coverView = UIView()
     var activityLoader = UIView()
     var preloader = NVActivityIndicatorView(frame: .zero, type: .circleStrokeSpin, color: K.Colors.defaultGreen, padding: .none)
+    var profileImageView = UIImageView()
+    var firstName = ""
+    var emailDetails = ""
     
     //MARK: - OVERRIDES
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupViews()
+    }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        NetworkClass.shared.loadUserData { (feedback) in
+            if feedback.success?.status == "SUCCESS" {
+                DispatchQueue.main.async {
+                    guard let url = URL(string: feedback.success?.data?.avatar ?? "") else { return }
+                    UIImage.loadImage(from: url) { (image) in
+                        self.profileImageView.image = image
+                    }
+                    self.firstName = feedback.success?.data?.firstname ?? String()
+                    self.emailDetails = feedback.success?.data?.email ?? String()
+                }
+            }
+        } failure: { (error) in
+            print("Error\(error)")
+        }
     }
     
     //MARK: - SETUP VIEWS
@@ -52,6 +72,7 @@ class SignupViewController: UIViewController {
         setupLoginButton()
         setupPreloader()
     }
+    
     func setupConditionsLabel() {
         view.addSubview(termsAndConditionsLabel)
         termsAndConditionsLabel.numberOfLines = 0
@@ -168,7 +189,6 @@ class SignupViewController: UIViewController {
         horizontalStackView.axis = .horizontal
         horizontalStackView.distribution = .fillEqually
         horizontalStackView.spacing = 20
-        
         firstNameTextField.placeholder = "First name"
         firstNameTextField.borderStyle = UITextField.BorderStyle.none
         firstNameTextField.addBottomBorder()
@@ -198,16 +218,11 @@ class SignupViewController: UIViewController {
             make.top.equalTo(titleLabelView.snp.bottom).offset(20)
             make.height.equalTo(view).multipliedBy(0.3)
         }
-
-
-        
     }
     
     func addVerticalStackViewSubViews() {
-        
         emailAddressTextField.placeholder = "Email Address"
         emailAddressTextField.setValue(UIFont(name: "FoundersGrotesk-Regular", size: 15.0),forKeyPath: "placeholderLabel.font")
-
         emailAddressTextField.borderStyle = UITextField.BorderStyle.none
         emailAddressTextField.addBottomBorder()
         emailAddressTextField.keyboardType = .emailAddress
@@ -341,6 +356,9 @@ class SignupViewController: UIViewController {
     
     @objc func handleLoginButton( _ sender: UIButton) {
         let destinationVc = WelcomeBackViewController()
+        destinationVc.profileImageView = profileImageView
+        destinationVc.emailDetails = emailDetails
+        destinationVc.firstName = firstName
         destinationVc.modalPresentationStyle = .fullScreen
         present(destinationVc, animated: true)
     }

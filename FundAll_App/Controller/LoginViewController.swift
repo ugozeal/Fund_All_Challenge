@@ -23,6 +23,9 @@ class LoginViewController: UIViewController {
     var coverView = UIView()
     var activityLoader = UIView()
     var preloader = NVActivityIndicatorView(frame: .zero, type: .circleStrokeSpin, color: K.Colors.defaultGreen, padding: .none)
+    var firstName = ""
+    var emailDetails = ""
+    var profileImageView = UIImageView()
 
     //MARK:- OVERRIDES
     override func viewDidLoad() {
@@ -34,6 +37,24 @@ class LoginViewController: UIViewController {
         setupUsernameField()
         setupBiometricButton()
         setupPasswordButton()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        NetworkClass.shared.loadUserData { (feedback) in
+            if feedback.success?.status == "SUCCESS" {
+                DispatchQueue.main.async {
+                    guard let url = URL(string: feedback.success?.data?.avatar ?? "") else { return }
+                    UIImage.loadImage(from: url) { (image) in
+                        self.profileImageView.image = image
+                    }
+                    self.firstName = feedback.success?.data?.firstname ?? String()
+                    self.emailDetails = feedback.success?.data?.email ?? String()
+                }
+            }
+        } failure: { (error) in
+            print("Error\(error)")
+        }
     }
     
     //MARK:- SETUP VIEWS
@@ -204,6 +225,9 @@ class LoginViewController: UIViewController {
     
     @objc func handleSignUpButton(_ sender: UIButton) {
         let destinationVc = WelcomeBackViewController()
+        destinationVc.emailDetails = emailDetails
+        destinationVc.firstName = firstName
+        destinationVc.profileImageView = profileImageView
         destinationVc.modalPresentationStyle = .fullScreen
         present(destinationVc, animated: true)
     }
