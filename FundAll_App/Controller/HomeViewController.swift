@@ -39,7 +39,11 @@ class HomeViewController: UIViewController {
                 DispatchQueue.main.async {
                     guard let url = URL(string: feedback.success?.data?.avatar ?? "") else { return }
                     UIImage.loadImage(from: url) { (image) in
-                        self.profileImageView.image = image
+                        if image != nil {
+                            self.profileImageView.image = image
+                        } else {
+                            self.profileImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.exclamationmark", withConfiguration: UIImage.SymbolConfiguration(weight: .regular))?.withTintColor(K.Colors.defaultGreen ?? UIColor(), renderingMode: .alwaysOriginal)
+                        }
                     }
                 }
             }
@@ -55,17 +59,18 @@ class HomeViewController: UIViewController {
         setupCardsView()
         setupCardScrollView()
         setupCardTableView()
+        PreloaderClass.shared.setupPreloader(view, text: "Uploading Avatar...")
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
     }
-
+    
     // MARK: - Setup Views
     func setupScrollView() {
         view.addSubview(scrollView)
@@ -124,6 +129,7 @@ class HomeViewController: UIViewController {
         
         topView.addSubview(profileImageView)
         profileImageView.clipsToBounds = true
+        profileImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.exclamationmark", withConfiguration: UIImage.SymbolConfiguration(weight: .regular))?.withTintColor(K.Colors.defaultGreen ?? UIColor(), renderingMode: .alwaysOriginal)
         profileImageView.contentMode = .scaleAspectFill
         profileImageView.layer.cornerRadius = 15
         profileImageView.snp.makeConstraints { (make) in
@@ -269,7 +275,7 @@ class HomeViewController: UIViewController {
             make.height.width.equalTo(50)
         }
     }
-
+    
     //Lunch and Car fuel view
     func setupLunchView() {
         scrollView.addSubview(activityView)
@@ -327,7 +333,7 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(burgerImageView).offset(2)
             make.left.equalTo(burgerImageView.snp.right).offset(11)
         }
-
+        
         let lunchAmountText = UILabel()
         lunchView1.addSubview(lunchAmountText)
         lunchAmountText.attributedText = NSMutableAttributedString(string: "$52/day", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -337,7 +343,7 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(burgerImageView).offset(2)
             make.right.equalTo(lunchView1).offset(-15)
         }
-
+        
         let lunchView2 = UIView()
         mainLunchView.addSubview(lunchView2)
         lunchView2.addViewBorderColor()
@@ -386,7 +392,7 @@ class HomeViewController: UIViewController {
             make.width.equalTo(lunchRangeView1).multipliedBy(0.5)
             make.height.equalTo(lunchRangeView1)
         }
-
+        
         let rangeTwoText = UILabel()
         lunchRangeView2.addSubview(rangeTwoText)
         rangeTwoText.attributedText = NSMutableAttributedString(string: "$450", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -396,7 +402,7 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(lunchRangeView2).offset(2)
             make.left.equalTo(lunchRangeView2).offset(18)
         }
-
+        
         let rangeOneText = UILabel()
         lunchRangeView1.addSubview(rangeOneText)
         rangeOneText.attributedText = NSMutableAttributedString(string: "$900", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -415,7 +421,7 @@ class HomeViewController: UIViewController {
             make.width.equalTo(2)
             make.right.equalTo(rangeOneText.snp.left).offset(-20)
         }
-
+        
         let carFuelView1 = UIView()
         carFuelView.addSubview(carFuelView1)
         carFuelView1.snp.makeConstraints { (make) in
@@ -442,7 +448,7 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(houseImageView).offset(2)
             make.left.equalTo(houseImageView.snp.right).offset(11)
         }
-
+        
         let carFuelAmountText = UILabel()
         carFuelView1.addSubview(carFuelAmountText)
         carFuelAmountText.attributedText = NSMutableAttributedString(string: "$20/day", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -452,7 +458,7 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(houseImageView).offset(2)
             make.right.equalTo(carFuelView1).offset(-15)
         }
-
+        
         let carFuelView2 = UIView()
         carFuelView.addSubview(carFuelView2)
         carFuelView2.addViewBorderColor()
@@ -501,7 +507,7 @@ class HomeViewController: UIViewController {
             make.width.equalTo(carFuelRangeView1).multipliedBy(0.65)
             make.height.equalTo(carFuelRangeView1)
         }
-
+        
         let carRangeTwoText = UILabel()
         carFuelRangeView2.addSubview(carRangeTwoText)
         carRangeTwoText.attributedText = NSMutableAttributedString(string: "$600", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -511,7 +517,7 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(carFuelRangeView2).offset(2)
             make.left.equalTo(carFuelRangeView2).offset(18)
         }
-
+        
         let carRangeOneText = UILabel()
         carFuelRangeView1.addSubview(carRangeOneText)
         carRangeOneText.attributedText = NSMutableAttributedString(string: "$900", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -607,7 +613,7 @@ class HomeViewController: UIViewController {
             make.width.equalTo(view).multipliedBy(0.4)
             make.height.equalTo(cardsView).multipliedBy(0.4)
         }
-
+        
         let card1Text = UILabel()
         card1.addSubview(card1Text)
         card1Text.attributedText = NSMutableAttributedString(string: "Fundall Lifestyle Card", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -629,7 +635,7 @@ class HomeViewController: UIViewController {
             make.width.equalTo(view).multipliedBy(0.4)
             make.height.equalTo(cardsView).multipliedBy(0.4)
         }
-
+        
         let card2Text = UILabel()
         card2.addSubview(card2Text)
         card2Text.attributedText = NSMutableAttributedString(string: "Fundall Lifestyle Card", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
@@ -728,7 +734,7 @@ class HomeViewController: UIViewController {
     }
     
     
-
+    
 }
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
@@ -757,18 +763,21 @@ extension HomeViewController: UIImagePickerControllerDelegate,UINavigationContro
         guard let image = info[.editedImage] as? UIImage else { return }
         dismiss(animated: true)
         currentImage = image
-        profileImageView.image = currentImage
         uploadProfileImage()
     }
 }
 
 extension HomeViewController {
     func uploadProfileImage() {
+        PreloaderClass.shared.startAnimation()
         ApiClientWithHeaders.shared.requestImageUpload(image: currentImage) { (response, error) in
             if let successResp = response {
+                PreloaderClass.shared.stopAnimation()
+                self.profileImageView.image = self.currentImage
                 print(successResp.success?.message ?? String())
             }
             if let failure = error {
+                PreloaderClass.shared.stopAnimation()
                 print("Error\(failure)")
             }
         }
