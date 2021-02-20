@@ -28,9 +28,6 @@ class SignupViewController: UIViewController {
     var registerationModel = RegistrationReq()
     var authenticateUser = AuthenticateUserReq()
     let userDefaults = UserDefaults.standard
-    var coverView = UIView()
-    var activityLoader = UIView()
-    var preloader = NVActivityIndicatorView(frame: .zero, type: .circleStrokeSpin, color: K.Colors.defaultGreen, padding: .none)
     var profileImageView = UIImageView()
     var firstName = ""
     var emailDetails = ""
@@ -70,7 +67,7 @@ class SignupViewController: UIViewController {
         setupGetCodeButton()
         setupSignupButton()
         setupLoginButton()
-        setupPreloader()
+        PreloaderClass.shared.setupPreloader(view, text: "Signing up...")
     }
     
     func setupConditionsLabel() {
@@ -271,59 +268,6 @@ class SignupViewController: UIViewController {
         navigationItem.rightBarButtonItem = benefitsButton
     }
     
-    //Set up Preloader
-    func setupPreloader() {
-        view.addSubview(coverView)
-        coverView.backgroundColor = UIColor(red: 0.18, green: 0.19, blue: 0.2, alpha: 0.9)
-        coverView.isHidden = true
-        coverView.snp.makeConstraints { (make) in
-            make.edges.equalTo(view)
-        }
-        activityLoader = UIView()
-        coverView.addSubview(activityLoader)
-        activityLoader.backgroundColor = .systemBackground
-        activityLoader.layer.cornerRadius = 5
-        activityLoader.addSubview(preloader)
-        activityLoader.isHidden = true
-        activityLoader.snp.makeConstraints { (make) in
-            make.left.equalTo(24)
-            make.right.equalTo(-24)
-            make.centerY.equalTo(view)
-            make.height.equalTo(view).multipliedBy(0.08)
-        }
-        preloader.snp.makeConstraints { (make) in
-            make.centerY.equalTo(activityLoader)
-            make.height.equalTo(activityLoader).multipliedBy(0.5)
-            make.width.equalTo(preloader.snp.height)
-            make.left.equalTo(16)
-        }
-        let tittleText = UILabel()
-        activityLoader.addSubview(tittleText)
-        tittleText.font = UIFont(name: K.Fonts.regular, size: 13)
-        tittleText.textColor = .label
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.0
-        tittleText.attributedText = NSMutableAttributedString(string: "Creating Account", attributes: [NSAttributedString.Key.kern: 0.25, NSAttributedString.Key.paragraphStyle: paragraphStyle])
-        tittleText.snp.makeConstraints { (make) in
-            make.centerY.equalTo(activityLoader)
-            make.left.equalTo(preloader.snp.right).offset(16)
-            make.height.equalTo(activityLoader).multipliedBy(0.7)
-            make.right.equalTo(-16)
-        }
-    }
-    
-    func stopAnimation() {
-        activityLoader.isHidden = true
-        coverView.isHidden = true
-        preloader.stopAnimating()
-    }
-    
-    func startAnimation() {
-        activityLoader.isHidden = false
-        coverView.isHidden = false
-        preloader.startAnimating()
-    }
-    
     @objc func handleCancelButton() {
         
     }
@@ -338,7 +282,7 @@ class SignupViewController: UIViewController {
             if passwordTextField.text?.count ?? 0 >= 6 {
                 if firstNameTextField.text?.isEmpty == false && lastNameTextField.text?.isEmpty == false {
                     if phoneNumberTextField.text?.count ?? 0 == 11 {
-                        startAnimation()
+                        PreloaderClass.shared.startAnimation()
                         registerClient()
                     } else {
                         dismissAlert("OOPS!!!", "Phone number is not 11 digits", "okay")
@@ -396,7 +340,7 @@ extension SignupViewController {
         registerationModel.firstName = firstname
         registerationModel.lastName = lastname
         NetworkClass.shared.registerNewUser(requestModel: registerationModel) { (feedback) in
-            self.stopAnimation()
+            PreloaderClass.shared.stopAnimation()
             if feedback.success?.status == "SUCCESS" {
                 self.userDefaults.set(self.registerationModel.firstName, forKey: "firstName")
                 self.authentication()
@@ -404,7 +348,7 @@ extension SignupViewController {
                 self.dismissAlert("OOPS!!!", "The email has already been taken.", "Okay")
             }
         } failure: { (error) in
-            self.stopAnimation()
+            PreloaderClass.shared.stopAnimation()
             print("Error: \(error) Occured")
             self.dismissAlert("OOPS!!!", "\(error.description)", "Okay")
         }
@@ -416,7 +360,7 @@ extension SignupViewController {
         NetworkClass.shared.loginUser(requestModel: authenticateUser) { (feedback) in
             self.userDefaults.set(feedback.success?.user?.accessToken, forKey: "loginToken")
             self.userDefaults.set(self.authenticateUser.email, forKey: "userMail")
-            self.stopAnimation()
+            PreloaderClass.shared.stopAnimation()
             if feedback.success?.status ?? String() == "SUCCESS" {
                 let destinationVc = LoginViewController()
                 destinationVc.username = self.firstNameTextField.text
@@ -425,7 +369,7 @@ extension SignupViewController {
                 self.dismissAlert("OOPS!!!", "Check input field", "Okay")
             }
         } failure: { (error) in
-            self.stopAnimation()
+            PreloaderClass.shared.stopAnimation()
             self.dismissAlert("OOPS!!!", "\(error.description)", "Okay")
         }
     }

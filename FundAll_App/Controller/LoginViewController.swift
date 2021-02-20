@@ -20,9 +20,6 @@ class LoginViewController: UIViewController {
     var switchAccountButton = UIButton()
     var biometricButton = UIButton()
     var passwordButton = UIButton()
-    var coverView = UIView()
-    var activityLoader = UIView()
-    var preloader = NVActivityIndicatorView(frame: .zero, type: .circleStrokeSpin, color: K.Colors.defaultGreen, padding: .none)
     var firstName = ""
     var emailDetails = ""
     var profileImageView = UIImageView()
@@ -243,59 +240,6 @@ class LoginViewController: UIViewController {
         destinationVc.modalPresentationStyle = .fullScreen
         present(destinationVc, animated: true)
     }
-    
-    //Set up Preloader
-    func setupPreloader() {
-        view.addSubview(coverView)
-        coverView.backgroundColor = UIColor(red: 0.18, green: 0.19, blue: 0.2, alpha: 0.9)
-        coverView.isHidden = true
-        coverView.snp.makeConstraints { (make) in
-            make.edges.equalTo(view)
-        }
-        activityLoader = UIView()
-        coverView.addSubview(activityLoader)
-        activityLoader.backgroundColor = .systemBackground
-        activityLoader.layer.cornerRadius = 5
-        activityLoader.addSubview(preloader)
-        activityLoader.isHidden = true
-        activityLoader.snp.makeConstraints { (make) in
-            make.left.equalTo(24)
-            make.right.equalTo(-24)
-            make.centerY.equalTo(view)
-            make.height.equalTo(view).multipliedBy(0.08)
-        }
-        preloader.snp.makeConstraints { (make) in
-            make.centerY.equalTo(activityLoader)
-            make.height.equalTo(activityLoader).multipliedBy(0.5)
-            make.width.equalTo(preloader.snp.height)
-            make.left.equalTo(16)
-        }
-        let tittleText = UILabel()
-        activityLoader.addSubview(tittleText)
-        tittleText.font = UIFont(name: K.Fonts.regular, size: 13)
-        tittleText.textColor = .label
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.0
-        tittleText.attributedText = NSMutableAttributedString(string: "Signing in...", attributes: [NSAttributedString.Key.kern: 0.25, NSAttributedString.Key.paragraphStyle: paragraphStyle])
-        tittleText.snp.makeConstraints { (make) in
-            make.centerY.equalTo(activityLoader)
-            make.height.equalTo(activityLoader).multipliedBy(0.7)
-            make.left.equalTo(preloader.snp.right).offset(16)
-            make.right.equalTo(-16)
-        }
-    }
-    func stopAnimation() {
-        activityLoader.isHidden = true
-        coverView.isHidden = true
-        preloader.stopAnimating()
-    }
-    
-    func startAnimation() {
-        activityLoader.isHidden = false
-        coverView.isHidden = false
-        preloader.startAnimating()
-    }
-
 }
 
 extension LoginViewController {

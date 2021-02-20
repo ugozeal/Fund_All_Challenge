@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class CardViewCell: UITableViewCell {
     //MARK: - Private Properties

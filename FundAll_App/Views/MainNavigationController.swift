@@ -14,8 +14,7 @@ class MainNavigationController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addBackground("splash-screen")
-        
-        
+        self.perform(#selector(self.doNecessarySegue), with: nil, afterDelay: 2)
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -34,7 +33,6 @@ class MainNavigationController: UIViewController {
                 }
                 self.firstName = feedback.success?.data?.firstname ?? String()
                 self.emailDetails = feedback.success?.data?.email ?? String()
-                self.perform(#selector(self.doNecessarySegue), with: nil, afterDelay: 2)
             }
         } failure: { (error) in
             print("Error\(error)")

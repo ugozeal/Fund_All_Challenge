@@ -37,6 +37,7 @@
 		E248D6B025DDB26200ED5E65 /* WelcomeBackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E248D6AF25DDB26100ED5E65 /* WelcomeBackViewController.swift */; };
 		E248D6B325DDC93200ED5E65 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E248D6B225DDC93200ED5E65 /* HomeViewController.swift */; };
 		E24C83BC25DF9F9200F5BFEF /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E24C83BB25DF9F9200F5BFEF /* UIImage+Extension.swift */; };
+		E259B1EC25E0DF7A001DD1AB /* PreloaderClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E259B1EB25E0DF7A001DD1AB /* PreloaderClass.swift */; };
 		E2E6065025DE764900DCBE86 /* CardActivityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E6064F25DE764900DCBE86 /* CardActivityModel.swift */; };
 		E2E6065325DE7A3B00DCBE86 /* CardViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E6065225DE7A3B00DCBE86 /* CardViewCell.swift */; };
 		E2E6065625DE975D00DCBE86 /* PickCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E6065525DE975D00DCBE86 /* PickCardViewController.swift */; };
@@ -83,6 +84,7 @@
 		E248D6AF25DDB26100ED5E65 /* WelcomeBackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeBackViewController.swift; sourceTree = "<group>"; };
 		E248D6B225DDC93200ED5E65 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		E24C83BB25DF9F9200F5BFEF /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		E259B1EB25E0DF7A001DD1AB /* PreloaderClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreloaderClass.swift; sourceTree = "<group>"; };
 		E2E6064F25DE764900DCBE86 /* CardActivityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardActivityModel.swift; sourceTree = "<group>"; };
 		E2E6065225DE7A3B00DCBE86 /* CardViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewCell.swift; sourceTree = "<group>"; };
 		E2E6065525DE975D00DCBE86 /* PickCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickCardViewController.swift; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 			isa = PBXGroup;
 			children = (
 				E248D67725DD538400ED5E65 /* String+Extension.swift */,
+				E259B1EB25E0DF7A001DD1AB /* PreloaderClass.swift */,
 				E24C83BB25DF9F9200F5BFEF /* UIImage+Extension.swift */,
 				E248D67B25DD53AC00ED5E65 /* UIViewController+Extension.swift */,
 				E248D67E25DD53FA00ED5E65 /* UITextField+Extension.swift */,
@@ -396,6 +399,7 @@
 				E248D6AA25DD76B700ED5E65 /* StringConstants.swift in Sources */,
 				E2E6067625DEFB6100DCBE86 /* MainNavigationController.swift in Sources */,
 				E2E6065325DE7A3B00DCBE86 /* CardViewCell.swift in Sources */,
+				E259B1EC25E0DF7A001DD1AB /* PreloaderClass.swift in Sources */,
 				E248D6B325DDC93200ED5E65 /* HomeViewController.swift in Sources */,
 				E2E6066225DEC75100DCBE86 /* Request.swift in Sources */,
 				E2E6065925DEA0F200DCBE86 /* PickCardViewCell.swift in Sources */,

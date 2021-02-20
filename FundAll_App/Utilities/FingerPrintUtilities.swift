@@ -27,9 +27,6 @@ extension FingerprintUtils {
                 
                 if success {
                     DispatchQueue.main.async() {
-//                        let alert = UIAlertController(title: "Success", message: "Authenticated succesfully!", preferredStyle: UIAlertController.Style.alert)
-//                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-//                        vc.present(alert, animated: true, completion: nil)
                         onSuccess()
                     }
                 } else {

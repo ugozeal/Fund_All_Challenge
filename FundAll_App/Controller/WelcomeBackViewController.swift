@@ -21,11 +21,9 @@ class WelcomeBackViewController: UIViewController {
     var createAccountButton = UIButton()
     var loginButton = UIButton()
     let userDefaults = UserDefaults.standard
-    var coverView = UIView()
-    var activityLoader = UIView()
-    var preloader = NVActivityIndicatorView(frame: .zero, type: .circleStrokeSpin, color: K.Colors.defaultGreen, padding: .none)
-    var emailDetails = ""
-    var firstName = ""
+    var emailDetails: String?
+    var defaultEmail = ""
+    var firstName: String?
     let delay = 3
 
     //MARK: - Overrides
@@ -33,6 +31,7 @@ class WelcomeBackViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupAllViews()
+        defaultEmail = UserDefaults.standard.string(forKey: "userMail") ?? String()
     }
     
     override func viewDidLayoutSubviews() {
@@ -42,7 +41,12 @@ class WelcomeBackViewController: UIViewController {
                 DispatchQueue.main.async {
                     guard let url = URL(string: feedback.success?.data?.avatar ?? "") else { return }
                     UIImage.loadImage(from: url) { (image) in
-                        self.profileImageView.image = image
+                        
+                        if image != nil {
+                            self.profileImageView.image = image
+                        } else {
+                            self.profileImageView.image = UIImage(systemName: "person.crop.circle.fill.badge.exclamationmark", withConfiguration: UIImage.SymbolConfiguration(weight: .regular))?.withTintColor(K.Colors.defaultGreen ?? UIColor(), renderingMode: .alwaysOriginal)
+                        }
                     }
                     self.firstName = feedback.success?.data?.firstname ?? String()
                     self.emailDetails = feedback.success?.data?.email ?? String()
@@ -62,7 +66,7 @@ class WelcomeBackViewController: UIViewController {
         setupPasswordField()
         setupLoginButton()
         setUpCreateAccountView()
-        setupPreloader()
+        PreloaderClass.shared.setupPreloader(view, text: "Signing in ...")
     }
     
     func setupTitleLabel() {
@@ -107,7 +111,7 @@ class WelcomeBackViewController: UIViewController {
         let titleLabel = UILabel()
         userDetailsView.addSubview(titleLabel)
         paragraphStyle.lineHeightMultiple = 1.1
-        titleLabel.attributedText = NSMutableAttributedString(string: "We miss you, \(firstName)", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+        titleLabel.attributedText = NSMutableAttributedString(string: "We miss you, \(firstName ?? "")", attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
         titleLabel.textColor = .label
         titleLabel.font = UIFont(name: K.Fonts.medium, size: 27)
         titleLabel.snp.makeConstraints { (make) in
@@ -117,7 +121,7 @@ class WelcomeBackViewController: UIViewController {
         
         let subTitleLabel = UILabel()
         userDetailsView.addSubview(subTitleLabel)
-        subTitleLabel.attributedText = NSMutableAttributedString(string: emailDetails, attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+        subTitleLabel.attributedText = NSMutableAttributedString(string: emailDetails ?? defaultEmail, attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
         subTitleLabel.textColor = .label
         subTitleLabel.font = UIFont(name: K.Fonts.regularItalics, size: 15)
         subTitleLabel.snp.makeConstraints { (make) in
@@ -209,58 +213,6 @@ class WelcomeBackViewController: UIViewController {
         navigationItem.leftBarButtonItem = cancelButton
     }
     
-    //Set up Preloader
-    func setupPreloader() {
-        view.addSubview(coverView)
-        coverView.backgroundColor = UIColor(red: 0.18, green: 0.19, blue: 0.2, alpha: 0.9)
-        coverView.isHidden = true
-        coverView.snp.makeConstraints { (make) in
-            make.edges.equalTo(view)
-        }
-        activityLoader = UIView()
-        coverView.addSubview(activityLoader)
-        activityLoader.backgroundColor = .systemBackground
-        activityLoader.layer.cornerRadius = 5
-        activityLoader.addSubview(preloader)
-        activityLoader.isHidden = true
-        activityLoader.snp.makeConstraints { (make) in
-            make.left.equalTo(24)
-            make.right.equalTo(-24)
-            make.centerY.equalTo(view)
-            make.height.equalTo(view).multipliedBy(0.08)
-        }
-        preloader.snp.makeConstraints { (make) in
-            make.centerY.equalTo(activityLoader)
-            make.height.equalTo(activityLoader).multipliedBy(0.5)
-            make.width.equalTo(preloader.snp.height)
-            make.left.equalTo(16)
-        }
-        let tittleText = UILabel()
-        activityLoader.addSubview(tittleText)
-        tittleText.font = UIFont(name: K.Fonts.regular, size: 13)
-        tittleText.textColor = .label
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 0.8
-        tittleText.attributedText = NSMutableAttributedString(string: "Signing in...", attributes: [NSAttributedString.Key.kern: 0.25, NSAttributedString.Key.paragraphStyle: paragraphStyle])
-        tittleText.snp.makeConstraints { (make) in
-            make.centerY.equalTo(activityLoader)
-            make.left.equalTo(preloader.snp.right).offset(16)
-            make.height.equalTo(activityLoader).multipliedBy(0.7)
-            make.right.equalTo(-16)
-        }
-    }
-    
-    func stopAnimation() {
-        activityLoader.isHidden = true
-        coverView.isHidden = true
-        preloader.stopAnimating()
-    }
-    
-    func startAnimation() {
-        activityLoader.isHidden = false
-        coverView.isHidden = false
-        preloader.startAnimating()
-    }
     
     @objc func handleCancelButton() {
         
@@ -273,7 +225,7 @@ class WelcomeBackViewController: UIViewController {
     
     @objc func handleLoginButton() {
         if passwordTextField.text?.isEmpty == false {
-            startAnimation()
+            PreloaderClass.shared.startAnimation()
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(delay)) {
                 self.authentication()
             }
@@ -297,15 +249,15 @@ extension WelcomeBackViewController {
         authenticateUser.password = passwordTextField.text
         NetworkClass.shared.loginUser(requestModel: authenticateUser) { (feedback) in
             self.userDefaults.set(feedback.success?.user?.accessToken, forKey: "loginToken")
-            self.stopAnimation()
+            PreloaderClass.shared.stopAnimation()
             if feedback.success?.status ?? String() == "SUCCESS" {
                 let destinationVc = HomeViewController()
-                self.alertDialog("AWESOME", "Welcome back \(self.firstName)", destinationVc, "Proceed")
+                self.alertDialog("AWESOME", "Welcome back \(self.firstName ?? "")", destinationVc, "Proceed")
             } else {
                 self.dismissAlert("OOPS!!!", "Check input field", "Okay")
             }
         } failure: { (error) in
-            self.stopAnimation()
+            PreloaderClass.shared.stopAnimation()
             self.dismissAlert("OOPS!!!", "\(error.description)", "Okay")
         }
     }
